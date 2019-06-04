@@ -7,6 +7,7 @@ from common.network_controller import NetworkController
 from common.utils.load_config import *
 from common.utils.paths import *
 from common.utils.logger import *
+from common.utils.ShortUtteranceConverter import create_data_lists
 
 
 class IVECController(NetworkController):
@@ -72,10 +73,10 @@ class IVECController(NetworkController):
         test_iv_long = test_stat_long.estimate_hidden(tv_mean, tv_sigma, V=tv, batch_size=100, num_thread=nbThread)[0]
         test_iv_short = test_stat_short.estimate_hidden(tv_mean, tv_sigma, V=tv, batch_size=100, num_thread=nbThread)[0]
 
+        iv_lis, y_list, s_list = create_data_lists(False, test_iv_long.stat1, test_iv_short.stat1, test_list_long.leftids.astype(int), test_list_short.leftids.astype(int))
 
         #generate embeddings
-        embeddings, speakers, num_embeddings=generate_embeddings(test_iv_long.stat1, test_iv_short.stat1, test_list_long.leftids.astype(int),
-                                                                       test_list_short.leftids.astype(int), vector_size)
+        embeddings, speakers, num_embeddings=generate_embeddings(iv_lis, y_list, vector_size)
 
         set_of_embeddings.append(embeddings)
         set_of_speakers.append(speakers)
