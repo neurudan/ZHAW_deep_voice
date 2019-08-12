@@ -12,6 +12,7 @@ from theano.gradient import np
 from common.analysis.mr import misclassification_rate
 from common.utils.logger import *
 from common.utils.paths import *
+from common.utils.load_config import *
 from common.utils.pickler import load, save
 
 metric_names = ["MR", "ACP", "ARI", "DER"]
@@ -67,10 +68,15 @@ def _plot_curves(plot_file_name, curve_names, metric_sets, number_of_embeddings)
     logger = get_logger('analysis', logging.INFO)
     logger.info('Plot results')
 
+    config = load_config(None, join(get_common(), 'config.cfg'))
+    plot_width = config.getint('common', 'plot_width')
+    fig_width = config.getint('common', 'fig_width')
+    fig_height = config.getint('common', 'fig_height')
     #Slice results to only 1-80 clusters
     for i in range(0,len(metric_sets)):
         for j in range(0, len(metric_sets[i])):
-            metric_sets[i][j] = metric_sets[i][j][-80:]
+            metric_sets[i][j] = metric_sets[i][j][-plot_width:]
+            print(len(metric_sets[i][j]))
 
     best_results = [[] for _ in metric_names]
     for m, min_value in enumerate(metric_min_values):
@@ -99,7 +105,7 @@ def _plot_curves(plot_file_name, curve_names, metric_sets, number_of_embeddings)
     plt.rcParams.update({'font.size': 12})
 
     # Define number of figures
-    fig1 = plt.figure(figsize=(18, 12))
+    fig1 = plt.figure(figsize=(fig_width, fig_height))
 
     # Define Plots
     plot_grid = (3, 2)
@@ -127,7 +133,7 @@ def _plot_curves(plot_file_name, curve_names, metric_sets, number_of_embeddings)
             label = label + '\n {} {}: {}'.format('Max' if metric_min_values[m]==0 else 'Min', metric_name,
                                                   str(best_results[m][index]))
         color = colors[index]
-        number_of_clusters = np.arange(80, 0, -1)
+        number_of_clusters = np.arange(plot_width, 0, -1)
 
         for plot, value in curves:
             plot.plot(number_of_clusters, value[index], color=color, label=label)
@@ -149,10 +155,12 @@ def _add_cluster_subplot(grid, position, y_label, colspan=1):
     :param colspan: number of columns for the x axis, default is 1
     :return: the subplot itself
     """
+    config = load_config(None, join(get_common(), 'config.cfg'))
+    plot_width = config.getint('common', 'plot_width')
     subplot = plt.subplot2grid(grid, position, colspan=colspan)
     subplot.set_ylabel(y_label)
     subplot.set_xlabel('number of clusters')
-    subplot.set_xlim([-3, 83])
+    subplot.set_xlim([-3, plot_width + 3])
     subplot.set_ylim([-0.05, 1.05])
     return subplot
 

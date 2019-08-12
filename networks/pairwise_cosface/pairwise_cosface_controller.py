@@ -1,5 +1,5 @@
 """
-The controller to train and test the pairwise_kldiv network
+The controller to train and test the pairwise_cosface network
 """
 
 from common.clustering.generate_embeddings import generate_embeddings
@@ -13,27 +13,27 @@ from .network_training.network_factory import *
 from common.spectrogram.speaker_dev_selector import load_test_data
 
 
-class KLDivController(NetworkController):
+class PairwiseCosFaceController(NetworkController):
     def __init__(self, config):
-        super().__init__("pairwise_kldiv", config)
-        self.checkpoints = ["pairwise_kldiv_" + str(config.getint('pairwise_kldiv', 'n_classes')) + ".pickle"]
+        super().__init__("pairwise_cosface", config)
+        self.checkpoints = ["pairwise_cosface_" + str(config.getint('pairwise_cosface', 'n_classes')) + ".pickle"]
 
     def train_network(self):
         net_file = get_experiment_nets(self.checkpoints[0])
         train_file = get_speaker_pickle(config.get('train', 'pickle'),)
 
-        create_and_train(num_epochs=config.getint('pairwise_kldiv', 'num_epochs'),
-                         batch_size=config.getint('pairwise_kldiv', 'batch_size'),
+        create_and_train(num_epochs=config.getint('pairwise_cosface', 'num_epochs'),
+                         batch_size=config.getint('pairwise_cosface', 'batch_size'),
                          network_params_file_in=None,
                          network_params_file_out=net_file,
                          train_file=train_file,
-                         epoch_batches=config.getint('pairwise_kldiv', 'epoch_batches'),
+                         epoch_batches=config.getint('pairwise_cosface', 'epoch_batches'),
                          network_fun=create_network_470_speakers, with_validation=False)
 
     def get_embeddings(self):
         short_utterance = self.config.getboolean('validation', 'short_utterances')
         logger = get_logger('kldiv', logging.INFO)
-        logger.info('Run pairwise_kldiv')
+        logger.info('Run pairwise_cosface')
         checkpoints = self.checkpoints
 
         X_train, y_train, s_list_train = load_test_data(self.get_validation_train_data())
@@ -67,7 +67,7 @@ class KLDivController(NetworkController):
             set_of_num_embeddings.append(num_embeddings)
 
             # Calculate the time per utterance
-            time = TimeCalculator.calc_time_all_utterances(y_cluster_list, config.getint('pairwise_kldiv', 'seg_size'))
+            time = TimeCalculator.calc_time_all_utterances(y_cluster_list, config.getint('pairwise_cosface', 'seg_size'))
             set_of_total_times.append(time)
 
         return checkpoints, set_of_embeddings, set_of_speakers, set_of_num_embeddings, set_of_total_times

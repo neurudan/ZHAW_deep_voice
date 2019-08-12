@@ -32,10 +32,11 @@ from common.utils.load_config import *
 # -------------------
 from networks.flow_me.me_controller import MEController
 from networks.lu_vo.luvo_controller import LuvoController
+from networks.pairwise_cosface.pairwise_cosface_controller import PairwiseCosFaceController
+from networks.pairwise_lstm_cosface.lstm_cosface_controller import LSTMCosFaceController
 from networks.pairwise_kldiv.kldiv_controller import KLDivController
 from networks.pairwise_lstm.lstm_controller import LSTMController
 from networks.gmm.gmm_controller import GMMController
-
 
 class Controller:
     def __init__(self, config):
@@ -88,6 +89,8 @@ class Controller:
         controller_dict = {
             'pairwise_lstm': [LSTMController(self.config)],
             'pairwise_kldiv': [KLDivController(self.config)],
+            'pairwise_cosface': [PairwiseCosFaceController(self.config)],
+            'pairwise_lstm_cosface': [LSTMCosFaceController(self.config)],
             #'flow_me': [MEController(self.clear, self.debug, False)],
             'luvo': [LuvoController(self.config)],
             'gmm': [GMMController(self.config)],
